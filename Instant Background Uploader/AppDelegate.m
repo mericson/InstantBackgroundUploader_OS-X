@@ -61,6 +61,10 @@
 	[self UploadImage];
 }
 
+- (IBAction)ShowSettingsBox:(id)sender
+{
+}
+
 
 -(NSString *)Base64Encode:(NSData *)data{
 	// Point to start of the data and set buffer sizes

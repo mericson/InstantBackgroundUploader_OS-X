@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2313FE3A1772AD060052D648 /* SettingsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2313FE391772AD060052D648 /* SettingsWindow.xib */; };
 		2A7AD1AE1542194900C65963 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A7AD1AD1542194900C65963 /* Cocoa.framework */; };
 		2A7AD1BA1542194900C65963 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7AD1B91542194900C65963 /* main.m */; };
 		2A7AD1C11542194900C65963 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7AD1C01542194900C65963 /* AppDelegate.m */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2313FE391772AD060052D648 /* SettingsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SettingsWindow.xib; sourceTree = "<group>"; };
 		2A7AD1A91542194900C65963 /* Instant Background Uploader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Instant Background Uploader.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A7AD1AD1542194900C65963 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		2A7AD1B01542194900C65963 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -93,6 +95,7 @@
 				2A7AD1CF15421A6800C65963 /* MAAttachedWindow.m */,
 				2A7AD1C21542194900C65963 /* MainMenu.xib */,
 				2A7AD1B41542194900C65963 /* Supporting Files */,
+				2313FE391772AD060052D648 /* SettingsWindow.xib */,
 			);
 			path = "Instant Background Uploader";
 			sourceTree = "<group>";
@@ -164,6 +167,7 @@
 				2AB4BF7A1718B98C008DD772 /* Icon.png in Resources */,
 				2AB4BF7C1718BB6C008DD772 /* Icon-inv.png in Resources */,
 				2AB4BF7E1718C0A3008DD772 /* Icon.iconset in Resources */,
+				2313FE3A1772AD060052D648 /* SettingsWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

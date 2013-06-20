@@ -20,6 +20,13 @@
 	IBOutlet NSMenuItem * createPrivateShareMenuItem;
 	IBOutlet NSMenuItem * convertBase64MenuItem;
 
+    IBOutlet NSMenuItem * settingsMenuItem;
+    
+    
+    IBOutlet NSTextField * settingsUsername;
+    IBOutlet NSTextField * settingsPassword;
+    
+    
 	MAAttachedWindow *attachedWindow;
     IBOutlet NSView *view;
     IBOutlet NSTextField *textField;
