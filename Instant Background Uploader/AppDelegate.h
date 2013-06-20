@@ -16,8 +16,8 @@
     IBOutlet NSMenu *statusMenu;
     NSStatusItem * statusItem;
 
-	IBOutlet NSMenuItem * uploadPngMenuItem;
-	IBOutlet NSMenuItem * uploadJpgMenuItem;
+	IBOutlet NSMenuItem * createPublicShareMenuItem;
+	IBOutlet NSMenuItem * createPrivateShareMenuItem;
 	IBOutlet NSMenuItem * convertBase64MenuItem;
 
 	MAAttachedWindow *attachedWindow;

@@ -41,7 +41,7 @@
 #endif
 }
 
-- (IBAction)UploadImageAsPng:(id)sender
+- (IBAction)CreatePrivateShare:(id)sender
 {
 	//while (!(nil != conversionPngThread && [conversionPngThread isFinished]))
 	while (!targetImageDataExistsPng)
@@ -51,33 +51,16 @@
 	[self UploadImage];
 }
 
-- (IBAction)UploadImageAsJpg:(id)sender
+- (IBAction)CreatePublicShare:(id)sender
 {
 	//while (!(nil != conversionJpgThread && [conversionJpgThread isFinished]))
-	while (!targetImageDataExistsJpg)
+	while (!targetImageDataExistsPng)
 		usleep(50);
 
 	requestedUploadAction = 2;
 	[self UploadImage];
 }
 
-- (IBAction)ConvertImageAsPng:(id)sender
-{
-	while (!targetImageDataExistsPng)
-		usleep(50);
-
-	NSString * string = [NSString stringWithFormat:@"<img src=\"data:image/png;base64,%@\">", [self Base64Encode: targetImageDataPng]];
-	[self setPasteboardString: string];
-}
-
-- (IBAction)ConvertImageAsJpg:(id)sender
-{
-	while (!targetImageDataExistsJpg)
-		usleep(50);
-
-	NSString * string = [NSString stringWithFormat:@"<img src=\"data:image/jpeg;base64,%@\">", [self Base64Encode: targetImageDataJpg]];
-	[self setPasteboardString: string];
-}
 
 -(NSString *)Base64Encode:(NSData *)data{
 	// Point to start of the data and set buffer sizes
@@ -220,9 +203,9 @@
 	{
 		data = targetImageDataPng;
 	}
-	else if (2 == requestedUploadAction && targetImageDataExistsJpg)
+	else if (2 == requestedUploadAction && targetImageDataExistsPng)
 	{
-		data = targetImageDataJpg;
+		data = targetImageDataPng;
 	}
 	else
 	{
@@ -441,30 +424,18 @@
 	}
 	
 	ItemAndTitle * object = [ItemAndTitle new];
-	object->item = uploadPngMenuItem;
-	object->title = [NSString stringWithFormat:@"Upload Image from Clipboard (%lu KiB)", [targetImageDataPng length] / 1024];
+	object->item = createPrivateShareMenuItem;
+	object->title = [NSString stringWithFormat:@"Create Private Share (%lu KiB)", [targetImageDataPng length] / 1024];
+    
+    ItemAndTitle * publicObject = [ItemAndTitle new];
+	publicObject->item = createPublicShareMenuItem;
+	publicObject->title = [NSString stringWithFormat:@"Create Public Share (%lu KiB)", [targetImageDataPng length] / 1024];
+    
 	[self performSelectorOnMainThread:@selector(changeMenuTitle:)withObject:object waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(changeMenuTitle:)withObject:publicObject waitUntilDone:YES];
+
 }
 
-- (void)conversionJpgThreadMethod
-{
-	if (1 == sourceImageDataType || 2 == sourceImageDataType)
-	{
-		NSBitmapImageRep * bitmap = [NSBitmapImageRep imageRepWithData: sourceImageData];
-		NSData * data = [bitmap representationUsingType: NSJPEGFileType properties: nil];
-		if ([conversionJpgThread isCancelled])
-		{
-			return;
-		}
-		targetImageDataJpg = data;
-		targetImageDataExistsJpg = true;
-	}
-
-	ItemAndTitle * object = [ItemAndTitle new];
-	object->item = uploadJpgMenuItem;
-	object->title = [NSString stringWithFormat:@"Upload Image from Clipboard as JPEG (%lu KiB)", [targetImageDataJpg length] / 1024];
-	[self performSelectorOnMainThread:@selector(changeMenuTitle:)withObject:object waitUntilDone:YES];
-}
 
 - (IBAction)changeMenuTitle:(ItemAndTitle *)object
 {
@@ -473,7 +444,7 @@
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
-	if (item == uploadPngMenuItem)
+	if (item == createPrivateShareMenuItem)
 	{
 		// Update notificationPosition
 		NSRect frame = [[[NSApp currentEvent] window] frame];
@@ -483,10 +454,6 @@
 		if (nil != conversionPngThread)
 		{
 			[conversionPngThread cancel];
-		}
-		if (nil != conversionJpgThread)
-		{
-			[conversionJpgThread cancel];
 		}
 
 		// Figure out clipboard contents
@@ -523,13 +490,11 @@
 		// If there is an image in clipboard, enable menu items
 		if (0 != sourceImageDataType)
 		{
-			[item setTitle:@"Upload Image from Clipboard"];
+			[item setTitle:@"Create Private Share"];
 
 			// Start conversion threads
 			conversionPngThread = [[NSThread alloc] initWithTarget:self selector:@selector(conversionPngThreadMethod) object:nil];
 			[conversionPngThread start];
-			conversionJpgThread = [[NSThread alloc] initWithTarget:self selector:@selector(conversionJpgThreadMethod) object:nil];
-			[conversionJpgThread start];
 
 			return YES;
 		}
@@ -539,12 +504,12 @@
 			return NO;
 		}
 	}
-	else if (item == uploadJpgMenuItem)
+	else if (item == createPublicShareMenuItem)
 	{
-		[item setHidden: ![uploadPngMenuItem isEnabled]];
-		[item setTitle:@"Upload Image from Clipboard as JPEG"];
+		[item setHidden: ![createPrivateShareMenuItem isEnabled]];
+		[item setTitle:@"Create Public Share"];
 
-		[convertBase64MenuItem setHidden: ![uploadPngMenuItem isEnabled]];
+		[convertBase64MenuItem setHidden: ![createPrivateShareMenuItem isEnabled]];
 
 		return YES;
 	}
