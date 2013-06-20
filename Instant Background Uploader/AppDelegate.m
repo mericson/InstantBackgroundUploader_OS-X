@@ -195,6 +195,8 @@
 - (IBAction)UploadImage
 {
 	NSData * data = nil;
+    NSString *shareType = @"private";
+    
 	if (0 == requestedUploadAction)
 	{
 		return;
@@ -206,6 +208,7 @@
 	else if (2 == requestedUploadAction && targetImageDataExistsPng)
 	{
 		data = targetImageDataPng;
+        shareType = @"public";
 	}
 	else
 	{
@@ -216,16 +219,11 @@
 	if (nil != data)
 	{
 		// Upload image
-		NSString *urlString = @"http://www.imageshack.us/upload_api.php";
+		NSString *urlString = @"http://localhost:4567/receive";
 		NSString *filename;
 		NSString *type;
-		if (1 == requestedUploadAction) {
-			filename = @"Image.png";
-			type = @"image/png";
-		} else if (2 == requestedUploadAction) {
-			filename = @"Image.jpg";
-			type = @"image/jpeg";
-		}
+        filename = @"Image.png";
+        type = @"image/png";
 		NSString * key = @"12DEFKTYa5517607af7de06ec6272205d57a9cf4";
 		NSMutableURLRequest * request= [[NSMutableURLRequest alloc] init];
 		[request setURL:[NSURL URLWithString:urlString]];
@@ -234,13 +232,22 @@
 		NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",boundary];
 		[request addValue:contentType forHTTPHeaderField: @"Content-Type"];
 		NSMutableData *postbody = [NSMutableData data];
-		[postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		
+        [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"key\"\r\n\r\n%@\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+      
+        [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"sharetype\"\r\n\r\n%@\r\n", shareType] dataUsingEncoding:NSUTF8StringEncoding]];
+        
 		[postbody appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"fileupload\"; filename=\"%@\"\r\n", filename] dataUsingEncoding:NSUTF8StringEncoding]];
-		[postbody appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", type] dataUsingEncoding:NSUTF8StringEncoding]];
+		
+        [postbody appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", type] dataUsingEncoding:NSUTF8StringEncoding]];
 		[postbody appendData:[NSData dataWithData:data]];
 		[postbody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+
+        
+        
 		[request setHTTPBody:postbody];
 		
 		NSData *returnData = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
