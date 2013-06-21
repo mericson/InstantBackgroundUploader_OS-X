@@ -9,19 +9,26 @@
 #import <Cocoa/Cocoa.h>
 
 @class MAAttachedWindow;
+@interface MyWindowController : NSWindowController {}
+
+@end
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
+
 {
+    
+
     NSWindow *window;
     IBOutlet NSMenu *statusMenu;
     NSStatusItem * statusItem;
 
 	IBOutlet NSMenuItem * createPublicShareMenuItem;
 	IBOutlet NSMenuItem * createPrivateShareMenuItem;
-	IBOutlet NSMenuItem * convertBase64MenuItem;
+	IBOutlet NSMenuItem * createShoutableShareMenuItem;
 
     IBOutlet NSMenuItem * settingsMenuItem;
-    
+
+    IBOutlet NSWindow *settingsWindow;
     
     IBOutlet NSTextField * settingsUsername;
     IBOutlet NSTextField * settingsPassword;
@@ -52,6 +59,7 @@
 - (void)toggleAttachedWindowAtPoint:(NSPoint)pt message:(NSString *)message withUrl:(NSURL *)Url;
 
 @property (assign) IBOutlet NSWindow *window;
+@property (nonatomic, strong) MyWindowController *windowController;
 
 @end
 
@@ -62,3 +70,8 @@
 	NSString * title;
 }
 @end
+
+
+
+
+

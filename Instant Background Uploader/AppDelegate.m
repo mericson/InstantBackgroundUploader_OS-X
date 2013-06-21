@@ -21,7 +21,6 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application
-
 	// Set self as NSUserNotificationCenter delegate
 	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate: self];
 
@@ -61,8 +60,31 @@
 	[self UploadImage];
 }
 
+- (IBAction)CreateShoutableShare:(id)sender
+{
+	//while (!(nil != conversionJpgThread && [conversionJpgThread isFinished]))
+	while (!targetImageDataExistsPng)
+		usleep(50);
+    
+	requestedUploadAction = 3;
+	[self UploadImage];
+}
+
 - (IBAction)ShowSettingsBox:(id)sender
 {
+    NSLog(@"Gosh!!!");
+    
+    
+    if (self.windowController == nil) {
+        self.windowController = [[MyWindowController alloc]
+                                 initWithWindowNibName:@"SettingsWindow"];
+    }
+    [self.windowController showWindow:nil];
+    
+    
+    //MyWindowController* controller = [[MyWindowController alloc] init];
+    //[controller showWindow:self];
+    
 }
 
 
@@ -213,6 +235,11 @@
 	{
 		data = targetImageDataPng;
         shareType = @"public";
+	}
+    else if (3 == requestedUploadAction && targetImageDataExistsPng)
+	{
+		data = targetImageDataPng;
+        shareType = @"shoutable";
 	}
 	else
 	{
@@ -441,9 +468,15 @@
     ItemAndTitle * publicObject = [ItemAndTitle new];
 	publicObject->item = createPublicShareMenuItem;
 	publicObject->title = [NSString stringWithFormat:@"Create Public Share (%lu KiB)", [targetImageDataPng length] / 1024];
+
+    ItemAndTitle * shoutableObject = [ItemAndTitle new];
+	shoutableObject->item = createShoutableShareMenuItem;
+	shoutableObject->title = [NSString stringWithFormat:@"Create Shoutable Share (%lu KiB)", [targetImageDataPng length] / 1024];
+   
     
 	[self performSelectorOnMainThread:@selector(changeMenuTitle:)withObject:object waitUntilDone:YES];
     [self performSelectorOnMainThread:@selector(changeMenuTitle:)withObject:publicObject waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(changeMenuTitle:)withObject:shoutableObject waitUntilDone:YES];
 
 }
 
@@ -520,11 +553,21 @@
 		[item setHidden: ![createPrivateShareMenuItem isEnabled]];
 		[item setTitle:@"Create Public Share"];
 
-		[convertBase64MenuItem setHidden: ![createPrivateShareMenuItem isEnabled]];
 
 		return YES;
 	}
+    else if (item == createShoutableShareMenuItem)
+	{
+		[item setHidden: ![createPrivateShareMenuItem isEnabled]];
+		[item setTitle:@"Create Shoutable Share"];
+        
+        
+		return YES;
+	}
 
+
+    
+    
 	return YES;
 }
 
@@ -546,23 +589,48 @@
 
 	requestedUploadAction = 0;
 
-	statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-	//[statusItem setTitle:@"Status"];
-	NSSize app_icon_size = NSMakeSize(16, 16);
-	NSImage * app_icon = [NSImage imageNamed:@"Icon"];
-	[app_icon setSize: app_icon_size];
-	NSImage * app_icon_inv = [NSImage imageNamed:@"Icon-inv"];
-	[app_icon_inv setSize: app_icon_size];
-	[statusItem setImage:app_icon];
-	[statusItem setAlternateImage: app_icon_inv];
-	[statusItem setHighlightMode:YES];
+    if ( ! statusItem ) {
+        NSLog( );
+        statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+        //[statusItem setTitle:@"Status"];
+        NSSize app_icon_size = NSMakeSize(16, 16);
+        NSImage * app_icon = [NSImage imageNamed:@"Icon"];
+        [app_icon setSize: app_icon_size];
+        NSImage * app_icon_inv = [NSImage imageNamed:@"Icon-inv"];
+        [app_icon_inv setSize: app_icon_size];
+        [statusItem setImage:app_icon];
+        [statusItem setAlternateImage: app_icon_inv];
+        [statusItem setHighlightMode:YES];
 
-	[statusItem setMenu:statusMenu];
-	/*[statusItem setAction:@selector(openMenu:)];
-	[statusItem sendActionOn: NSLeftMouseDownMask];
-	[statusItem setTarget:self];*/
+        [statusItem setMenu:statusMenu];
+        /*[statusItem setAction:@selector(openMenu:)];
+        [statusItem sendActionOn: NSLeftMouseDownMask];
+        [statusItem setTarget:self];*/
 
-	[statusItem setToolTip:@"Instant Background Uploader (0.007)"];
+        [statusItem setToolTip:@"Instant Background Uploader (0.007)"];
+    }
 }
 
 @end
+
+
+@implementation MyWindowController
+
+- (id)init
+{
+    //self = [super initWithWindowNibName:@"SettingsWindow"];
+    //if(self)
+    //{
+    //    //initialize stuff
+    //}
+    return self;
+}
+//this is a simple override of -showWindow: to ensure the window is always centered
+-(IBAction)showWindow:(id)sender
+{
+    [[self window] center];
+    [super showWindow:sender];
+}
+@end
+
+
