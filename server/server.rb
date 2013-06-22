@@ -27,20 +27,31 @@ post '/receive' do
   pp params
   
   key = Time.now.tv_usec
-  
-  File.open( "#{key}.png", "w" ) do |png|
-    png.puts params['fileupload'][:tempfile].read
+  if params['textupload'] 
+    File.open( "/tmp/#{key}.html", "w" ) do |html|
+      html.puts params['textupload']
+    end    
+  elsif params['fileupload']    
+    File.open( "/tmp/#{key}.png", "w" ) do |png|
+      png.puts params['fileupload'][:tempfile].read
+    end
   end
   
-  puts "<image_link>http://localhost:4567/#{key}</image_link>"
-  return "<image_link>http://localhost:4567/#{key}</image_link>"
+  puts "<share_link>http://localhost:4567/#{key}</share_link>"
+  return "<share_link>http://localhost:4567/#{key}</share_link>"
 
 end
 
 get '*' do
   base = request.path_info.sub( /^\//, '' )
-  content_type "image/png"
-  png = File.open( "#{base}.png" ).read
+  if File.exist? "/tmp/#{base}.html" 
+    return File.open( "/tmp/#{base}.html" ).read
+  elsif File.exist? "/tmp/#{base}.png"
+    content_type "image/png"
+    return File.open( "/tmp/#{base}.png" ).read
+  else
+    return "Unable to find share"
+  end
 end
 
 
