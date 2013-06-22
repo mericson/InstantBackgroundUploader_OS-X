@@ -9,7 +9,7 @@
 #import "AppDelegate.h"
 #import "MAAttachedWindow.h"
 
-#define DECISION_KEEP_NOTIFICATIONS_IN_NC 0
+#define DECISION_KEEP_NOTIFICATIONS_IN_NC 1
 
 @implementation ItemAndTitle
 @end
@@ -22,6 +22,50 @@
 {
     // Insert code here to initialize your application
 	// Set self as NSUserNotificationCenter delegate
+    
+    
+    attachedWindow = nil;
+	closeTimer = nil;
+	repeatingTimer = nil;
+    
+	sourceImageDataType = 0;
+	sourceImageData = nil;
+	targetImageDataExistsPng = false;
+	targetImageDataPng = nil;
+	targetImageDataExistsJpg = false;
+	targetImageDataJpg = nil;
+    
+    targetImageDataTxt = nil;
+    targetImageDataExistsTxt = false;
+    
+	conversionPngThread = nil;
+	conversionJpgThread = nil;
+    
+	requestedUploadAction = 0;
+    
+    if ( ! statusItem ) {
+        NSLog( @"Creating Menu" );
+        statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+        //[statusItem setTitle:@"Status"];
+        NSSize app_icon_size = NSMakeSize(16, 16);
+        NSImage * app_icon = [NSImage imageNamed:@"Icon"];
+        [app_icon setSize: app_icon_size];
+        NSImage * app_icon_inv = [NSImage imageNamed:@"Icon-inv"];
+        [app_icon_inv setSize: app_icon_size];
+        [statusItem setImage:app_icon];
+        [statusItem setAlternateImage: app_icon_inv];
+        [statusItem setHighlightMode:YES];
+        
+        [statusItem setMenu:statusMenu];
+        /*[statusItem setAction:@selector(openMenu:)];
+         [statusItem sendActionOn: NSLeftMouseDownMask];
+         [statusItem setTarget:self];*/
+        
+        [statusItem setToolTip:@"Instant Background Uploader (0.007)"];
+    }
+
+    
+    
 	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate: self];
 
 	// If we were opened from a user notification, do the corresponding action
@@ -80,7 +124,7 @@
                                  initWithWindowNibName:@"SettingsWindow"];
     }
     [self.windowController showWindow:nil];
-    
+//
     
     //MyWindowController* controller = [[MyWindowController alloc] init];
     //[controller showWindow:self];
@@ -270,14 +314,20 @@
         [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"sharetype\"\r\n\r\n%@\r\n", shareType] dataUsingEncoding:NSUTF8StringEncoding]];
         
-		[postbody appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"fileupload\"; filename=\"%@\"\r\n", filename] dataUsingEncoding:NSUTF8StringEncoding]];
-		
-        [postbody appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", type] dataUsingEncoding:NSUTF8StringEncoding]];
-		[postbody appendData:[NSData dataWithData:data]];
-		[postbody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-
+        if ( sourceImageDataType == 1 || sourceImageDataType == 2 ) {
         
+            [postbody appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"fileupload\"; filename=\"%@\"\r\n", filename] dataUsingEncoding:NSUTF8StringEncoding]];
+            
+            [postbody appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", type] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postbody appendData:[NSData dataWithData:data]];
+        }  else if ( sourceImageDataType == 3 ) {
+            NSString * dataStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"textupload\"\r\n\r\n%@\r\n", dataStr] dataUsingEncoding:NSUTF8StringEncoding]];
+            
+        }
+        [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
         
 		[request setHTTPBody:postbody];
 		
@@ -460,6 +510,17 @@
 		targetImageDataPng = data;
 		targetImageDataExistsPng = true;
 	}
+    else if ( 3 == sourceImageDataType ) {
+        
+        NSData * data = sourceImageData;
+ 		if ([conversionPngThread isCancelled])
+		{
+			return;
+		}
+        targetImageDataPng = data;
+		targetImageDataExistsPng = true;
+        
+    }
 	
 	ItemAndTitle * object = [ItemAndTitle new];
 	object->item = createPrivateShareMenuItem;
@@ -521,6 +582,17 @@
 			targetImageDataExistsJpg = false;
 			targetImageDataJpg = nil;
 		}
+		else if (nil != (data = [pb dataForType: NSPasteboardTypeString]))
+        {
+            NSString * dataStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            sourceImageDataType = 3;
+            sourceImageData = data;
+            targetImageDataExistsPng = false;
+			targetImageDataPng = nil;
+			targetImageDataExistsJpg = false;
+			targetImageDataJpg = nil;
+        
+        }
 		else
 		{
 			sourceImageDataType = 0;
@@ -532,7 +604,7 @@
 		}
 
 		// If there is an image in clipboard, enable menu items
-		if (0 != sourceImageDataType)
+		if ( sourceImageDataType == 1 || sourceImageDataType == 2)
 		{
 			[item setTitle:@"Create Private Share"];
 
@@ -542,6 +614,12 @@
 
 			return YES;
 		}
+        else if ( sourceImageDataType == 3 )
+        {
+            conversionPngThread = [[NSThread alloc] initWithTarget:self selector:@selector(conversionPngThreadMethod) object:nil];
+			[conversionPngThread start];
+            return YES;
+        }
 		else
 		{
 			[item setTitle:@"No Image in Clipboard"];
@@ -573,42 +651,6 @@
 
 - (void)awakeFromNib
 {
-	attachedWindow = nil;
-	closeTimer = nil;
-	repeatingTimer = nil;
-
-	sourceImageDataType = 0;
-	sourceImageData = nil;
-	targetImageDataExistsPng = false;
-	targetImageDataPng = nil;
-	targetImageDataExistsJpg = false;
-	targetImageDataJpg = nil;
-
-	conversionPngThread = nil;
-	conversionJpgThread = nil;
-
-	requestedUploadAction = 0;
-
-    if ( ! statusItem ) {
-        NSLog( );
-        statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-        //[statusItem setTitle:@"Status"];
-        NSSize app_icon_size = NSMakeSize(16, 16);
-        NSImage * app_icon = [NSImage imageNamed:@"Icon"];
-        [app_icon setSize: app_icon_size];
-        NSImage * app_icon_inv = [NSImage imageNamed:@"Icon-inv"];
-        [app_icon_inv setSize: app_icon_size];
-        [statusItem setImage:app_icon];
-        [statusItem setAlternateImage: app_icon_inv];
-        [statusItem setHighlightMode:YES];
-
-        [statusItem setMenu:statusMenu];
-        /*[statusItem setAction:@selector(openMenu:)];
-        [statusItem sendActionOn: NSLeftMouseDownMask];
-        [statusItem setTarget:self];*/
-
-        [statusItem setToolTip:@"Instant Background Uploader (0.007)"];
-    }
 }
 
 @end

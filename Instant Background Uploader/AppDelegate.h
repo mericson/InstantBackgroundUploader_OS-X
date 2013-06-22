@@ -46,6 +46,11 @@
 	NSData * targetImageDataPng;
 	bool targetImageDataExistsJpg;
 	NSData * targetImageDataJpg;
+    
+    NSData * targetImageDataTxt;
+    bool targetImageDataExistsTxt;
+
+
 	
 	NSThread * conversionPngThread;
 	NSThread * conversionJpgThread;
