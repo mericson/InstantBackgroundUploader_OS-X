@@ -1,2 +1,0 @@
-			conversionPngThread = [[NSThread alloc] initWithTarget:self selector:@selector(conversionPngThreadMethod) object:nil];
-			[conversionPngThread start];
