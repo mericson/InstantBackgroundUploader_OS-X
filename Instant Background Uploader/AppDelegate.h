@@ -9,8 +9,14 @@
 #import <Cocoa/Cocoa.h>
 
 @class MAAttachedWindow;
-@interface MyWindowController : NSWindowController {}
-
+@interface MyWindowController : NSWindowController {
+    NSString * apiUsername;
+    NSString * apiKey;
+    
+    IBOutlet NSTextField * settingsUsername;
+    IBOutlet NSTextField * settingsApiKey;
+    }
+-(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key;
 @end
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
@@ -30,8 +36,7 @@
 
     IBOutlet NSWindow *settingsWindow;
     
-    IBOutlet NSTextField * settingsUsername;
-    IBOutlet NSTextField * settingsApiKey;
+
     
     NSString * apiUsername;
     NSString * apiKey;

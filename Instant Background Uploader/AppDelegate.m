@@ -139,10 +139,10 @@
                                  initWithWindowNibName:@"SettingsWindow"];
     }
 
+    [self.windowController setUsernameAndApiKey:apiUsername apiKey:apiKey];
     [self.windowController showWindow:nil];
     NSLog( apiUsername );
-    [settingsUsername setStringValue:apiUsername];
-    [settingsApiKey setStringValue:apiKey];
+
 
 
 //
@@ -706,13 +706,18 @@
 
 
 }
--(IBAction)setUsernameAndPassword: (NSString*)username password: (NSString *)password
+-(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key
 {
+    apiUsername = username;
+    apiKey = key;
+
 }
 
 -(void)awakeFromNib
 {
-    [settingsApiKey setStringValue:apiKey] 
+    [settingsUsername setStringValue:apiUsername];
+    [settingsApiKey setStringValue:apiKey];
+
 }
 
 @end
