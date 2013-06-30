@@ -99,7 +99,7 @@
 						<object class="NSTextField" id="134595182">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 60}, {64, 17}}</string>
+							<string key="NSFrame">{{17, 60}, {51, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="847483996"/>
@@ -108,7 +108,7 @@
 							<object class="NSTextFieldCell" key="NSCell" id="349196335">
 								<int key="NSCellFlags">68157504</int>
 								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">Password</string>
+								<string key="NSContents">API Key</string>
 								<reference key="NSSupport" ref="227574128"/>
 								<string key="NSCellIdentifier">_NS:1535</string>
 								<reference key="NSControlView" ref="134595182"/>
@@ -254,6 +254,22 @@
 						<reference key="destination" ref="1005"/>
 					</object>
 					<int key="connectionID">82</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">settingsUsername</string>
+						<reference key="source" ref="741219326"/>
+						<reference key="destination" ref="958521986"/>
+					</object>
+					<int key="connectionID">84</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">settingsApiKey</string>
+						<reference key="source" ref="741219326"/>
+						<reference key="destination" ref="847483996"/>
+					</object>
+					<int key="connectionID">85</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -747,19 +763,53 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">83</int>
+			<int key="maxID">85</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">AppDelegate</string>
 					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="CreatePrivateShare:">id</string>
+						<string key="CreatePublicShare:">id</string>
+						<string key="CreateShoutableShare:">id</string>
+						<string key="ShowSettingsBox:">id</string>
+						<string key="UploadImageAsNotificationCenter:">id</string>
+						<string key="changeMenuTitle:">ItemAndTitle</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="CreatePrivateShare:">
+							<string key="name">CreatePrivateShare:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="CreatePublicShare:">
+							<string key="name">CreatePublicShare:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="CreateShoutableShare:">
+							<string key="name">CreateShoutableShare:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="ShowSettingsBox:">
+							<string key="name">ShowSettingsBox:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="UploadImageAsNotificationCenter:">
+							<string key="name">UploadImageAsNotificationCenter:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeMenuTitle:">
+							<string key="name">changeMenuTitle:</string>
+							<string key="candidateClassName">ItemAndTitle</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="createPrivateShareMenuItem">NSMenuItem</string>
 						<string key="createPublicShareMenuItem">NSMenuItem</string>
 						<string key="createShoutableShareMenuItem">NSMenuItem</string>
+						<string key="settingsApiKey">NSTextField</string>
 						<string key="settingsMenuItem">NSMenuItem</string>
-						<string key="settingsPassword">NSTextField</string>
 						<string key="settingsUsername">NSTextField</string>
 						<string key="settingsWindow">NSWindow</string>
 						<string key="statusMenu">NSMenu</string>
@@ -780,13 +830,13 @@
 							<string key="name">createShoutableShareMenuItem</string>
 							<string key="candidateClassName">NSMenuItem</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="settingsApiKey">
+							<string key="name">settingsApiKey</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="settingsMenuItem">
 							<string key="name">settingsMenuItem</string>
 							<string key="candidateClassName">NSMenuItem</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="settingsPassword">
-							<string key="name">settingsPassword</string>
-							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="settingsUsername">
 							<string key="name">settingsUsername</string>
@@ -819,8 +869,27 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">ItemAndTitle</string>
+					<string key="superclassName">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ItemAndTitle.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">MyWindowController</string>
 					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">showWindow:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/MyWindowController.h</string>

@@ -17,12 +17,26 @@
 @implementation AppDelegate
 
 @synthesize window = _window;
+@synthesize settingsUsername = _settingsUsername;
+@synthesize settingsApiKey = _se;
+
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application
 	// Set self as NSUserNotificationCenter delegate
     
+    
+    // Get defaults out of NSUserDefaults
+    
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    apiUsername    = [defaults stringForKey:@"username"];
+    if (apiUsername == nil) apiUsername = @"mericson";
+    
+    apiKey    = [defaults stringForKey:@"apikey"];
+    if (apiKey == nil) apiKey = @"enter your api key here";
     
     attachedWindow = nil;
 	closeTimer = nil;
@@ -119,11 +133,17 @@
     NSLog(@"Gosh!!!");
     
     
+    
     if (self.windowController == nil) {
         self.windowController = [[MyWindowController alloc]
                                  initWithWindowNibName:@"SettingsWindow"];
     }
+
     [self.windowController showWindow:nil];
+    [settingsUsername setStringValue:apiUsername];
+    [settingsApiKey setStringValue:apiKey];
+
+
 //
     
     //MyWindowController* controller = [[MyWindowController alloc] init];
@@ -312,19 +332,26 @@
 		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"key\"\r\n\r\n%@\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
       
         [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"sharetype\"\r\n\r\n%@\r\n", shareType] dataUsingEncoding:NSUTF8StringEncoding]];
+		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"share_type\"\r\n\r\n%@\r\n", shareType] dataUsingEncoding:NSUTF8StringEncoding]];
         
         if ( sourceImageDataType == 1 || sourceImageDataType == 2 ) {
         
+            [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"share_format\"\r\n\r\n%@\r\n", @"image"] dataUsingEncoding:NSUTF8StringEncoding]];
+            
             [postbody appendData:[[NSString stringWithFormat:@"--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"fileupload\"; filename=\"%@\"\r\n", filename] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"file_upload\"; filename=\"%@\"\r\n", filename] dataUsingEncoding:NSUTF8StringEncoding]];
             
             [postbody appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", type] dataUsingEncoding:NSUTF8StringEncoding]];
             [postbody appendData:[NSData dataWithData:data]];
         }  else if ( sourceImageDataType == 3 ) {
+            
+            [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"share_format\"\r\n\r\n%@\r\n", @"text"] dataUsingEncoding:NSUTF8StringEncoding]];
+            
             NSString * dataStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"textupload\"\r\n\r\n%@\r\n", dataStr] dataUsingEncoding:NSUTF8StringEncoding]];
+            [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"text_upload\"\r\n\r\n%@\r\n", dataStr] dataUsingEncoding:NSUTF8StringEncoding]];
             
         }
         [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -339,9 +366,9 @@
 		NSString * imageUrl = @"";
 		do
 		{
-			NSRange StartRange = [returnString rangeOfString:@"<image_link>" options:NSCaseInsensitiveSearch];
+			NSRange StartRange = [returnString rangeOfString:@"<share_link>" options:NSCaseInsensitiveSearch];
 			if (StartRange.location == NSNotFound) break;
-			NSRange EndRange = [returnString rangeOfString:@"</image_link>" options:NSCaseInsensitiveSearch range:NSMakeRange(StartRange.location + StartRange.length, [returnString length] - (StartRange.location + StartRange.length))];
+			NSRange EndRange = [returnString rangeOfString:@"</share_link>" options:NSCaseInsensitiveSearch range:NSMakeRange(StartRange.location + StartRange.length, [returnString length] - (StartRange.location + StartRange.length))];
 			if (EndRange.location == NSNotFound) break;
 			imageUrl = [returnString substringWithRange:NSMakeRange(StartRange.location + StartRange.length, EndRange.location - (StartRange.location + StartRange.length))];
 		}
@@ -672,6 +699,7 @@
 {
     [[self window] center];
     [super showWindow:sender];
+
 }
 @end
 

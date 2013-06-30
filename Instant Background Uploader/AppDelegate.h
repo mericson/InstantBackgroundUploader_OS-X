@@ -31,7 +31,13 @@
     IBOutlet NSWindow *settingsWindow;
     
     IBOutlet NSTextField * settingsUsername;
-    IBOutlet NSTextField * settingsPassword;
+    IBOutlet NSTextField * settingsApiKey;
+    
+    NSString * apiUsername;
+    NSString * apiKey;
+    
+    //IBOutlet NSTextField * settingsUsername;
+    //IBOutlet NSTextField * settingsApiKey;
     
     
 	MAAttachedWindow *attachedWindow;
@@ -65,6 +71,10 @@
 
 @property (assign) IBOutlet NSWindow *window;
 @property (nonatomic, strong) MyWindowController *windowController;
+
+@property (strong) IBOutlet NSTextField * settingsUsername;
+
+@property (strong) IBOutlet NSTextField * settingsApiKey;
 
 @end
 
