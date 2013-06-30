@@ -130,17 +130,28 @@
 
 - (IBAction)ShowSettingsBox:(id)sender
 {
-    NSLog(@"Gosh!!!");
-    
-    
     
     if (self.windowController == nil) {
         self.windowController = [[MyWindowController alloc]
                                  initWithWindowNibName:@"SettingsWindow"];
     }
 
+    
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    if ( apiUsername  = [prefs stringForKey:@"apiUsername"] ) {
+    } else {
+        apiUsername = @"monkeys";
+    }
+    
+    if ( apiKey  = [prefs stringForKey:@"apiKey"] ) {
+    } else {
+        apiKey = @"dogs";
+    }
+    
     [self.windowController setUsernameAndApiKey:apiUsername apiKey:apiKey];
     [self.windowController showWindow:nil];
+    [self.windowController setAppDelegate:self];
+    
     NSLog( apiUsername );
 
 
@@ -152,6 +163,10 @@
     
 }
 
+- (void)SaveSettings:(NSString*)username apiKey:(NSString *)key
+{
+    NSLog(@"Saving settings from App Delegate!");
+}
 
 -(NSString *)Base64Encode:(NSData *)data{
 	// Point to start of the data and set buffer sizes
@@ -695,26 +710,58 @@
     //}
     return self;
 }
+-(void)setAppDelegate:(NSApplication *)app {
+    appDelegate = app;
+}
 //this is a simple override of -showWindow: to ensure the window is always centered
 -(IBAction)showWindow:(id)sender
 {
+    
+    [settingsUsername setStringValue:apiUsername];
+    [settingsApiKey setStringValue:apiKey];
+    
     [[self window] center];
     [super showWindow:sender];
     [[self window] makeKeyAndOrderFront:self];
     [NSApp activateIgnoringOtherApps:YES];
-
-
-
 }
+
 -(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key
 {
     apiUsername = username;
     apiKey = key;
+}
+
+-(IBAction)saveUserSettings:(id)sender;
+{
+    NSLog( @"Saving User Settings");
+    apiUsername = [settingsUsername stringValue];
+    apiKey = [settingsApiKey stringValue];
+
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    [prefs setObject:apiUsername forKey:@"apiUsername"];
+    [prefs setObject:apiKey forKey:@"apiKey"];
+    [prefs synchronize];
+    
+    [[self window] close];
+    
+    
+    
+}
+
+-(IBAction)cancelSettings:(id)sender
+{
+    NSLog( @"Cancelling User Settings");
+    [[self window] close];
 
 }
 
+
+
 -(void)awakeFromNib
 {
+    NSLog( @"Awaking from Nib");
+
     [settingsUsername setStringValue:apiUsername];
     [settingsApiKey setStringValue:apiKey];
 

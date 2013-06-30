@@ -12,11 +12,13 @@
 @interface MyWindowController : NSWindowController {
     NSString * apiUsername;
     NSString * apiKey;
+    NSApplication * appDelegate;
     
     IBOutlet NSTextField * settingsUsername;
     IBOutlet NSTextField * settingsApiKey;
     }
 -(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key;
+-(void)setAppDelegate: (NSObject *)app;
 @end
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
@@ -71,7 +73,7 @@
 	NSTimer * closeTimer;
 	NSTimer * repeatingTimer;
 }
-
+- (void)SaveSettings:(NSString*)username apiKey:(NSString *)key;
 - (void)toggleAttachedWindowAtPoint:(NSPoint)pt message:(NSString *)message withUrl:(NSURL *)Url;
 
 @property (assign) IBOutlet NSWindow *window;
