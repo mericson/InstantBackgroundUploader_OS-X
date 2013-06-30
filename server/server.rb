@@ -27,13 +27,13 @@ post '/receive' do
   pp params
   
   key = Time.now.tv_usec
-  if params['textupload'] 
+  if params['text_upload'] 
     File.open( "/tmp/#{key}.html", "w" ) do |html|
       html.puts params['textupload']
     end    
-  elsif params['fileupload']    
+  elsif params['file_upload']    
     File.open( "/tmp/#{key}.png", "w" ) do |png|
-      png.puts params['fileupload'][:tempfile].read
+      png.puts params['file_upload'][:tempfile].read
     end
   end
   

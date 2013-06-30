@@ -140,6 +140,7 @@
     }
 
     [self.windowController showWindow:nil];
+    NSLog( apiUsername );
     [settingsUsername setStringValue:apiUsername];
     [settingsApiKey setStringValue:apiKey];
 
@@ -699,8 +700,21 @@
 {
     [[self window] center];
     [super showWindow:sender];
+    [[self window] makeKeyAndOrderFront:self];
+    [NSApp activateIgnoringOtherApps:YES];
+
+
 
 }
+-(IBAction)setUsernameAndPassword: (NSString*)username password: (NSString *)password
+{
+}
+
+-(void)awakeFromNib
+{
+    [settingsApiKey setStringValue:apiKey] 
+}
+
 @end
 
 
