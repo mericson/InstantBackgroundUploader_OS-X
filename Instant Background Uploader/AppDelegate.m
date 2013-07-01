@@ -31,12 +31,19 @@
     
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    apiUsername    = [defaults stringForKey:@"username"];
+
+    apiUsername    = [defaults stringForKey:@"apiUsername"];
     if (apiUsername == nil) apiUsername = @"mericson";
     
-    apiKey    = [defaults stringForKey:@"apikey"];
+    apiKey    = [defaults stringForKey:@"apiKey"];
     if (apiKey == nil) apiKey = @"enter your api key here";
+        
+    apiUrl    = [defaults stringForKey:@"apiUrl"];
+    if (apiUrl == nil) apiUrl = @"http://localhost:4567";
+    
+    
+    
+    NSLog( apiUrl );
     
     attachedWindow = nil;
 	closeTimer = nil;
@@ -137,18 +144,19 @@
     }
 
     
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    if ( apiUsername  = [prefs stringForKey:@"apiUsername"] ) {
+    /*NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    if ( apiUsername = [prefs stringForKey:@"apiUsername"] ) {
     } else {
         apiUsername = @"monkeys";
     }
     
-    if ( apiKey  = [prefs stringForKey:@"apiKey"] ) {
+    if ( apiKey = [prefs stringForKey:@"apiKey"] ) {
     } else {
         apiKey = @"dogs";
     }
+   
+    [self.windowController setUsernameAndApiKey:apiUsername apiKey:apiKey]; */
     
-    [self.windowController setUsernameAndApiKey:apiUsername apiKey:apiKey];
     [self.windowController showWindow:nil];
     [self.windowController setAppDelegate:self];
     
@@ -303,6 +311,20 @@
 	NSData * data = nil;
     NSString *shareType = @"private";
     
+    /* Update username out of settings */
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    apiUsername    = [defaults stringForKey:@"apiUsername"];
+    if (apiUsername == nil) apiUsername = @"mericson";
+    
+    apiKey    = [defaults stringForKey:@"apiKey"];
+    if (apiKey == nil) apiKey = @"enter your api key here";
+    
+    apiUrl    = [defaults stringForKey:@"apiUrl"];
+    if (apiUrl == nil) apiUrl = @"http://localhost:4567/receive";
+    
+    /* Figure out type of share */
+
 	if (0 == requestedUploadAction)
 	{
 		return;
@@ -344,8 +366,15 @@
 		[request addValue:contentType forHTTPHeaderField: @"Content-Type"];
 		NSMutableData *postbody = [NSMutableData data];
 		
-        [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        /*[postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"key\"\r\n\r\n%@\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+        */
+        
+        [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"username\"\r\n\r\n%@\r\n", apiUsername] dataUsingEncoding:NSUTF8StringEncoding]];
+        
+        [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"api_key\"\r\n\r\n%@\r\n", apiKey] dataUsingEncoding:NSUTF8StringEncoding]];
       
         [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		[postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"share_type\"\r\n\r\n%@\r\n", shareType] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -370,6 +399,9 @@
             [postbody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"text_upload\"\r\n\r\n%@\r\n", dataStr] dataUsingEncoding:NSUTF8StringEncoding]];
             
         }
+        
+
+        
         [postbody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
         
 		[request setHTTPBody:postbody];
@@ -716,44 +748,53 @@
 //this is a simple override of -showWindow: to ensure the window is always centered
 -(IBAction)showWindow:(id)sender
 {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *apiUsername    = [defaults stringForKey:@"apiUsername"];
+    if (apiUsername == nil) apiUsername = @"mericson";
+    
+    NSString *apiKey    = [defaults stringForKey:@"apiKey"];
+    if (apiKey == nil) apiKey = @"enter your api key here";
+    
+    NSString *apiUrl    = [defaults stringForKey:@"apiUrl"];
+    if (apiUrl == nil) apiUrl = @"http://localhost:4567";
     
     [settingsUsername setStringValue:apiUsername];
     [settingsApiKey setStringValue:apiKey];
-    
+    [settingsApiUrl setStringValue:apiUrl];
+
     [[self window] center];
     [super showWindow:sender];
     [[self window] makeKeyAndOrderFront:self];
     [NSApp activateIgnoringOtherApps:YES];
 }
 
--(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key
+/*-(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key
 {
     apiUsername = username;
     apiKey = key;
-}
+}*/
 
 -(IBAction)saveUserSettings:(id)sender;
 {
     NSLog( @"Saving User Settings");
-    apiUsername = [settingsUsername stringValue];
-    apiKey = [settingsApiKey stringValue];
+    NSString *apiUsername = [settingsUsername stringValue];
+    NSString *apiKey = [settingsApiKey stringValue];
+    NSString *apiUrl = [settingsApiUrl stringValue];
 
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs setObject:apiUsername forKey:@"apiUsername"];
     [prefs setObject:apiKey forKey:@"apiKey"];
+    [prefs setObject:apiUrl forKey:@"apiUrl"];
+
     [prefs synchronize];
     
     [[self window] close];
-    
-    
-    
 }
 
 -(IBAction)cancelSettings:(id)sender
 {
     NSLog( @"Cancelling User Settings");
     [[self window] close];
-
 }
 
 
@@ -762,8 +803,19 @@
 {
     NSLog( @"Awaking from Nib");
 
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *apiUsername    = [defaults stringForKey:@"apiUsername"];
+    if (apiUsername == nil) apiUsername = @"mericson";
+    
+    NSString *apiKey    = [defaults stringForKey:@"apiKey"];
+    if (apiKey == nil) apiKey = @"enter your api key here";
+    
+    NSString *apiUrl    = [defaults stringForKey:@"apiUrl"];
+    if (apiUrl == nil) apiUrl = @"http://localhost:4567";
+    
     [settingsUsername setStringValue:apiUsername];
     [settingsApiKey setStringValue:apiKey];
+    [settingsApiUrl setStringValue:apiUrl];
 
 }
 

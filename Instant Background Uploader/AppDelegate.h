@@ -10,14 +10,15 @@
 
 @class MAAttachedWindow;
 @interface MyWindowController : NSWindowController {
-    NSString * apiUsername;
-    NSString * apiKey;
+
     NSApplication * appDelegate;
     
     IBOutlet NSTextField * settingsUsername;
     IBOutlet NSTextField * settingsApiKey;
+    IBOutlet NSTextField * settingsApiUrl;
+
     }
--(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key;
+/* -(void)setUsernameAndApiKey: (NSString*)username apiKey:(NSString *)key apiUrl:(NSString *)url; */
 -(void)setAppDelegate: (NSObject *)app;
 @end
 
@@ -39,12 +40,9 @@
     IBOutlet NSWindow *settingsWindow;
     
 
-    
+    NSString * apiUrl;
     NSString * apiUsername;
     NSString * apiKey;
-    
-    //IBOutlet NSTextField * settingsUsername;
-    //IBOutlet NSTextField * settingsApiKey;
     
     
 	MAAttachedWindow *attachedWindow;
